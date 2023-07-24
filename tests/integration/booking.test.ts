@@ -38,6 +38,21 @@ describe('get', () => {
 
 
 
+  it('404 - sem reserva', async () => {
+    const usuario = await createUser()
+    const token = await generateValidToken(usuario)
+    const enrollment = await createEnrollmentWithAddress(usuario)
+    const tipoDeTicket = await createTicketTypeWithHotel()
+
+    await createTicket(enrollment.id, tipoDeTicket.id, 'PAID')
+
+    const resposta = await server.get('/booking').set('Authorization', `Bearer ${token}`)
+
+    expect(resposta.status).toBe(httpStatus.NOT_FOUND)
+  })
+
+
+
   it('401 - Sem token', async () => {
     const resposta = await server.get('/booking')
     expect(resposta.status).toBe(httpStatus.UNAUTHORIZED)
